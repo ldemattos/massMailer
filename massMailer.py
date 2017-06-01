@@ -40,7 +40,8 @@ def main(args):
 	parser.read(confFile)
 
 	# open mail log
-	fp_log = open('mail.log','w+')
+	bufsize = 0
+	fp_log = open('mail.log','w+',bufsize)
 
 	# Variables to be customized
 	custom_vars = ast.literal_eval(parser.get('message','custom'))
@@ -76,7 +77,7 @@ def main(args):
 			fp_log.write("%i) sending mail to %s... "%(i,tof))
 			libmailer.mailer(parser,msg.as_string(),msg['From'],msg['Subject'],msg['To'],fp_log)
 
-			# taking easy on SMTP
+			# taking it easy on SMTP
 			time.sleep(float(parser.get('smtp','delay')))
 
 			i+=1
