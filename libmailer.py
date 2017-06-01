@@ -28,13 +28,13 @@ def mailer(parser,msg,fromf,subf,tof,fp_log):
 	try:
 		if parser.get('smtp','server') == 'localhost':
 			smtpObj = smtplib.SMTP('localhost')
-			smtpObj.debuglevel(2)
+			smtpObj.set_debuglevel(True)
 			smtpObj.sendmail(fromf, tof, msg)
 			smtpObj.quit()
 			fp_log.write("OK!\n")
 		else:
 			smtpObj = smtplib.SMTP_SSL(parser.get('smtp','server')+':'+parser.get('smtp','port'),timeout=float(parser.get('smtp','timeout')))
-			smtpObj.debuglevel(2)
+			smtpObj.set_debuglevel(True)
 			smtpObj.login(parser.get('smtp','login'),parser.get('smtp','password'))
 			smtpObj.sendmail(fromf, tof, msg)
 			smtpObj.quit()
