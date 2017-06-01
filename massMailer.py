@@ -25,6 +25,8 @@ import sys
 from ConfigParser import SafeConfigParser
 import os.path
 import ast
+import time
+from email.header import Header
 
 # local libraries
 import libbuildmail
@@ -48,12 +50,14 @@ def main(args):
 
 		for line in clist:
 
-			# To field
 			line = line.split(';')
-			custom_vars['<<<ToName>>>'] = line[0]
-			print line[0]
-			print custom_vars
-			tof = "%s <%s>"%(line[0],line[1][:-1])
+
+			# To field
+			# tof = "%s <%s>"%(line[0],line[1][:-1])
+			tof = "\"%s\" <%s>" % (Header(line[0], 'utf-8'), line[1][:-1])
+
+			# set custom_vars
+			custom_vars['---ToName---'] = line[0]
 
 			if parser.get('message','attach') == 'None':
 				msg = libbuildmail.buildMessage(parser,tof,custom_vars)
@@ -70,6 +74,8 @@ def main(args):
 			# call mailer
 			fp_log.write("Sending mail to %s... "%(tof))
 			libmailer.mailer(parser,msg.as_string(),msg['From'],msg['Subject'],msg['To'],fp_log)
+
+		time.sleep(float(parser.get('smtp','delay')))
 
 	# close mail log
 	fp_log.close()

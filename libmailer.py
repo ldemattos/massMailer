@@ -21,12 +21,13 @@
 #  MA 02110-1301, USA.
 
 import smtplib
+import sys
 
 def mailer(parser,msg,fromf,subf,tof,fp_log):
 	try:
-		smtpObj = smtplib.SMTP_SSL(parser.get('smtp','server')+':'+parser.get('smtp','port'))
+		smtpObj = smtplib.SMTP_SSL(parser.get('smtp','server')+':'+parser.get('smtp','port'),timeout=float(parser.get('smtp','timeout')))
 		smtpObj.login(parser.get('smtp','login'),parser.get('smtp','password'))
 		smtpObj.sendmail(fromf, tof, msg)
 		fp_log.write("OK!\n")
 	except Exception:
-		fp_log.write("FAIL!\n")
+		fp_log.write("FAIL: %s\n"%(sys.exc_info()[0]))

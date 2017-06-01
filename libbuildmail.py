@@ -24,6 +24,7 @@ import os.path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from email.header import Header
 
 def buildMessage(parser,tof,custom_vars):
 
@@ -32,11 +33,14 @@ def buildMessage(parser,tof,custom_vars):
 		ctexto = customizeMessage(f.read(),custom_vars)
 		msg = MIMEText(ctexto,'html',_charset='UTF-8')
 
+	# Improving header
+	msg['Content-Type'] = "text/html; charset=utf-8"
+
 	# From field
-	msg['From'] = parser.get('from', 'name') +' <'+parser.get('from', 'email')+'>'
+	msg['From'] = "\"%s\" <%s>" % (Header(parser.get('from', 'name'), 'utf-8'), parser.get('from', 'email'))
 
     # Subject field
-	msg['Subject'] = parser.get('message', 'subject')
+	msg['Subject'] = Header(parser.get('message', 'subject'), 'utf-8')
 
 	# To field
 	msg['To'] = tof
@@ -48,19 +52,23 @@ def buildMessage_attach(parser,tof,custom_vars):
 	# read message file
 	with open(parser.get('message', 'sample_file'),'r') as text_file,\
 	 open(parser.get('message', 'attach'),'r') as pdf_file:
-	 	ctext = customizeMessage(ctext,custom_vars)
+	 	ctext = customizeMessage(text_file.read(),custom_vars)
 		text = MIMEText(ctext,'html',_charset='UTF-8')
 		pdf = MIMEApplication(pdf_file.read(), _subtype='pdf')
 		pdf.add_header('content-disposition', 'attachment',\
 		 filename=os.path.basename(parser.get('message', 'attach')))
 
+	# Building message with body and attachment
 	msg = MIMEMultipart(_subparts=(text,pdf))
 
-	# From field
-	msg['From'] = parser.get('from', 'name') +' <'+parser.get('from', 'email')+'>'
+	# Improving header
+	msg['Content-Type'] = "text/html; charset=utf-8"
 
-	# Subject field
-	msg['Subject'] = parser.get('message', 'subject')
+	# From field
+	msg['From'] = "\"%s\" <%s>" % (Header(parser.get('from', 'name'), 'utf-8'), parser.get('from', 'email'))
+
+    # Subject field
+	msg['Subject'] = Header(parser.get('message', 'subject'), 'utf-8')
 
 	# To field
 	msg['To'] = tof
