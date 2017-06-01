@@ -24,10 +24,7 @@
 import sys
 from ConfigParser import SafeConfigParser
 import os.path
-import base64
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
+import ast
 
 # local libraries
 import libbuildmail
@@ -40,33 +37,41 @@ def main(args):
 	confFile = sys.argv[1]
 	parser.read(confFile)
 
-	# To field
-	tof = "Leonardo <l@pot.eng.br>"
-
-	print parser.get('message','attach')
-	if parser.get('message','attach') == 'None':
-		msg = libbuildmail.buildMessage(parser,tof)
-
-	else:
-		# check whether the attachment file is there
-		if os.path.isfile(parser.get('message','attach')):
-			filename = os.path.basename(parser.get('message','attach'))
-			with open(parser.get('message','attach'),"rb") as f:
-				data = f.read()
-			encoded = base64.b64encode(data)
-			msg = libbuildmail.buildMessage_attach(parser,tof)
-
-		else:
-			print "Invalid attachment path file! Quitting..."
-			quit()
-
 	# open mail log
 	fp_log = open('mail.log','w+')
-	fp_log.write("Sending mail to %s... "%(tof))
 
-	# call mailer
-	libmailer.mailer(parser,msg.as_string(),msg['From'],msg['Subject'],msg['To'],fp_log)
+	# Variables to be customized
+	custom_vars = ast.literal_eval(parser.get('message','custom'))
 
+	# open contact list
+	with open(parser.get('recipients','rec_file'),'r') as clist:
+
+		for line in clist:
+
+			# To field
+			line = line.split(';')
+			custom_vars['<<<ToName>>>'] = line[0]
+			print line[0]
+			print custom_vars
+			tof = "%s <%s>"%(line[0],line[1][:-1])
+
+			if parser.get('message','attach') == 'None':
+				msg = libbuildmail.buildMessage(parser,tof,custom_vars)
+
+			else:
+				# check whether the attachment file is there
+				if os.path.isfile(parser.get('message','attach')):
+					msg = libbuildmail.buildMessage_attach(parser,tof,custom_vars)
+
+				else:
+					print "Invalid attachment path file! Quitting..."
+					quit()
+
+			# call mailer
+			fp_log.write("Sending mail to %s... "%(tof))
+			libmailer.mailer(parser,msg.as_string(),msg['From'],msg['Subject'],msg['To'],fp_log)
+
+	# close mail log
 	fp_log.close()
 
 	return(0)

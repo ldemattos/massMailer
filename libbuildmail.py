@@ -25,11 +25,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
-def buildMessage(parser,tof):
+def buildMessage(parser,tof,custom_vars):
 
 	# read body file and create new message
 	with open(parser.get('message', 'sample_file'),'r') as f:
-		msg = MIMEText(f.read(),'html',_charset='UTF-8')
+		ctexto = customizeMessage(f.read(),custom_vars)
+		msg = MIMEText(ctexto,'html',_charset='UTF-8')
 
 	# From field
 	msg['From'] = parser.get('from', 'name') +' <'+parser.get('from', 'email')+'>'
@@ -42,12 +43,13 @@ def buildMessage(parser,tof):
 
 	return(msg)
 
-def buildMessage_attach(parser,tof):
+def buildMessage_attach(parser,tof,custom_vars):
 
 	# read message file
 	with open(parser.get('message', 'sample_file'),'r') as text_file,\
-	 open(parser.get('message', 'attach'),'r') as pdf_file :
-		text = MIMEText(text_file.read(),'html',_charset='UTF-8')
+	 open(parser.get('message', 'attach'),'r') as pdf_file:
+	 	ctext = customizeMessage(ctext,custom_vars)
+		text = MIMEText(ctext,'html',_charset='UTF-8')
 		pdf = MIMEApplication(pdf_file.read(), _subtype='pdf')
 		pdf.add_header('content-disposition', 'attachment',\
 		 filename=os.path.basename(parser.get('message', 'attach')))
@@ -64,3 +66,10 @@ def buildMessage_attach(parser,tof):
 	msg['To'] = tof
 
 	return(msg)
+
+def customizeMessage(body,custom_vars):
+	# iterate over custom_vars
+	for key, value in custom_vars.iteritems():
+		body = body.replace(key,value)
+
+	return(body)
