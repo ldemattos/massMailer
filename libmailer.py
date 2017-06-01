@@ -41,5 +41,4 @@ def mailer(parser,msg,fromf,subf,tof,fp_log):
 			fp_log.write("OK!\n")
 	except Exception:
 		print sys.exc_info()
-		smtpObj.quit()
 		fp_log.write("FAIL: %s\n"%(sys.exc_info()[0]))
