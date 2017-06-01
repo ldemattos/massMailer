@@ -73,7 +73,7 @@ def main(args):
 					quit()
 
 			# call mailer
-			fp_log.write("%i) sending mail to %s... "%(tof,i))
+			fp_log.write("%i) sending mail to %s... "%(i,tof))
 			libmailer.mailer(parser,msg.as_string(),msg['From'],msg['Subject'],msg['To'],fp_log)
 
 			# taking easy on SMTP
