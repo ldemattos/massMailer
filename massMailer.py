@@ -46,6 +46,7 @@ def main(args):
 	custom_vars = ast.literal_eval(parser.get('message','custom'))
 
 	# open contact list
+	i = 0
 	with open(parser.get('recipients','rec_file'),'r') as clist:
 
 		for line in clist:
@@ -72,10 +73,13 @@ def main(args):
 					quit()
 
 			# call mailer
-			fp_log.write("Sending mail to %s... "%(tof))
+			fp_log.write("%i) sending mail to %s... "%(tof,i))
 			libmailer.mailer(parser,msg.as_string(),msg['From'],msg['Subject'],msg['To'],fp_log)
 
-		time.sleep(float(parser.get('smtp','delay')))
+			# taking easy on SMTP
+			time.sleep(float(parser.get('smtp','delay')))
+
+			i+=1
 
 	# close mail log
 	fp_log.close()
