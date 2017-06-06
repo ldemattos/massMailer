@@ -1,0 +1,29 @@
+# E-mail server settings
+[smtp]
+server: smtp.server.com
+port: 465
+login: login@login.com
+password: password
+# additional delay between two e-mails in seconds
+delay: 10.0
+# maximum  time span to dropout an e-mail transference
+timeout = 20.0
+
+# Data fill 'from' field
+[from]
+name: John Doe
+email: john@doecorp.com
+
+# Message
+[message]
+sample_file: path/to/message.html
+subject: Hello!
+# use None for no attached file
+attach: None
+attach: path/to/attachment.pdf
+# dictionary of strings to be customized
+custom: {"---ToName---": "XXX"}
+
+# List of recipients in format: John Doe; john@doecorp.com
+[recipients]
+rec_file: path/to/recipients.dat
